@@ -8,7 +8,8 @@ import {
   Monitor,
   Tablet,
   Package,
-  PlusSquare
+  PlusSquare,
+  Download
 } from "lucide-react";
 
 export default function ApkPage() {
@@ -50,6 +51,10 @@ export default function ApkPage() {
       setIsInstalled(true);
     }
     setDeferredPrompt(null);
+  };
+
+  const handleDownloadApk = () => {
+    window.location.href = "/api/download-apk";
   };
 
   return (
@@ -130,6 +135,23 @@ export default function ApkPage() {
                   </ol>
                 </div>
               )}
+
+              {/* Direct APK Download fallback */}
+              <div className="pt-4 mt-6 border-t border-natural-border w-full space-y-4">
+                <div className="space-y-1">
+                  <h5 className="font-bold font-serif text-sm text-natural-text text-left">Téléchargement APK Alternatif</h5>
+                  <p className="text-[11px] text-natural-secondary text-left leading-relaxed">
+                    Si l'installation PWA ci-dessus ne vous convient pas, vous pouvez forcer le téléchargement du package autonome (.apk). 
+                  </p>
+                </div>
+                <button
+                  onClick={handleDownloadApk}
+                  className="w-full bg-[#EAE5DD] hover:bg-[#D5D0C8] text-[#5A5A40] px-6 py-3 rounded-xl font-bold font-serif transition-all flex items-center justify-center gap-2"
+                >
+                  <Download size={16} />
+                  <span>Télécharger guiziga-translate.apk</span>
+                </button>
+              </div>
             </div>
           </div>
 
