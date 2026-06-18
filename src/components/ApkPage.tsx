@@ -53,8 +53,18 @@ export default function ApkPage() {
     setDeferredPrompt(null);
   };
 
-  const handleDownloadApk = () => {
-    window.location.href = "/api/download-apk";
+  const [apkDownloadError, setApkDownloadError] = useState<string | null>(null);
+
+  const handleDownloadApk = async () => {
+    try {
+      const response = await fetch("/api/download-apk");
+      if (!response.ok) {
+        const errorData = await response.json();
+        setApkDownloadError(errorData.message);
+      }
+    } catch (e) {
+      setApkDownloadError("Erreur réseau ou d'analyse.");
+    }
   };
 
   return (
@@ -151,6 +161,16 @@ export default function ApkPage() {
                   <Download size={16} />
                   <span>Télécharger guiziga-translate.apk</span>
                 </button>
+
+                {apkDownloadError && (
+                  <div className="mt-4 p-4 bg-red-50 border border-red-200 text-red-800 rounded-2xl text-[11px] leading-relaxed text-left font-serif">
+                    <div className="flex items-center gap-2 font-bold mb-1">
+                      <CheckCircle2 size={14} className="text-red-600" />
+                      <span>Erreur d'infrastructure détectée</span>
+                    </div>
+                    {apkDownloadError}
+                  </div>
+                )}
               </div>
             </div>
           </div>

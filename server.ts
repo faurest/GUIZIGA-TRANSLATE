@@ -165,12 +165,12 @@ Tu dois générer une description précise du contexte idéal d'usage (quand, à
 
 // REST API endpoint: Download companion mobile APK package
 app.get("/api/download-apk", (req, res) => {
-  const apkPlaceholder = Buffer.from(
-    "PK\x03\x04\n\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x11\x00\x00\x00AndroidManifest.xml... GUIZIGA translate Android Native Wrapper package. Ready for mobile installation side-load. Created by senior developers."
-  );
-  res.setHeader("Content-Disposition", "attachment; filename=guiziga-translate.apk");
-  res.setHeader("Content-Type", "application/vnd.android.package-archive");
-  res.send(apkPlaceholder);
+  res.status(501).json({
+    status: "error",
+    code: "MISSING_ANDROID_SDK",
+    message: "Le serveur Cloud actuel (Node.js) ne dispose pas des outils de compilation natifs (Java SDK, Gradle) nécessaires pour générer ou signer un véritable fichier .apk en dynamique. Le package précédent était corrompu (placeholder), ce qui causait l'erreur d'analyse sur votre téléphone Android. Veuillez utiliser l'installation PWA depuis le navigateur, qui est 100% fonctionnelle.",
+    resolution: "Pour générer un fichier .apk réel, exportez le projet localement et utilisez un compilateur hybride via npx cap add android."
+  });
 });
 
 // Configure Vite integration or Static Files serving
