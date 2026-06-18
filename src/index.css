@@ -1,0 +1,47 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=Lora:ital,wght@0,400;0,500;0,600;0,700;1,400;1,600&family=JetBrains+Mono:wght@400;500;600&display=swap');
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-serif: "Lora", Georgia, serif;
+  --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  
+  --color-natural-bg: #FDFBF7;
+  --color-natural-text: #4A3E37;
+  --color-natural-primary: #7D8471;
+  --color-natural-secondary: #5A5A40;
+  --color-natural-accent: #F2E9E1;
+  --color-natural-border: #E5E0D8;
+  --color-natural-muted: #A69D91;
+  --color-natural-dark-border: #D9D1C7;
+}
+
+/* Custom fade indicator for smooth view transitions */
+.page-fade-enter {
+  opacity: 0;
+  transform: translateY(4px);
+}
+
+.page-fade-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: opacity 250ms ease, transform 250ms ease;
+}
+
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}

@@ -1,0 +1,6 @@
+{
+  "name": "GUIZIGA translate",
+  "description": "Application experte de traduction écrite et orale du Guiziga et des langues de l'Extrême-Nord du Cameroun, avec guides de culture régionale, audio-validation et dictionnaire éditable.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
