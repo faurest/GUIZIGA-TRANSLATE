@@ -10,7 +10,8 @@ import {
   Save, 
   ArrowRight,
   RefreshCw,
-  Info
+  Info,
+  BookText
 } from "lucide-react";
 import { TranslationEntry } from "../types";
 
@@ -18,12 +19,14 @@ interface TranslationPageProps {
   sourceLang: string;
   setSourceLang: (lang: string) => void;
   onSaveToDictionary: (entry: Omit<TranslationEntry, "id" | "createdAt">) => void;
+  dictionary?: TranslationEntry[];
 }
 
 export default function TranslationPage({ 
   sourceLang, 
   setSourceLang, 
-  onSaveToDictionary 
+  onSaveToDictionary,
+  dictionary = []
 }: TranslationPageProps) {
   const [inputText, setInputText] = useState("");
   const [isRecording, setIsRecording] = useState(false);
@@ -145,30 +148,34 @@ export default function TranslationPage({
     setSavedSuccess(false);
 
     try {
-      const response = await fetch("/api/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: inputText,
-          sourceLang,
-          type: isRecording ? "oral" : "written",
-        }),
-      });
+      // Simulate local processing delay for better UX
+      await new Promise(resolve => setTimeout(resolve, 500));
 
-      if (!response.ok) {
-        const errData = await response.json();
-        throw new Error(errData.error || "Erreur de serveur.");
+      const query = inputText.toLowerCase().trim();
+      const match = dictionary.find(entry => 
+        entry.nativeText.toLowerCase().includes(query) || 
+        entry.frenchTranslation.toLowerCase().includes(query)
+      );
+
+      if (match) {
+        setTranslationResult({
+          translation: match.frenchTranslation,
+          phonetics: "Source : Lexique communautaire",
+          explanation: match.description
+        });
+      } else {
+        setTranslationResult({
+          translation: "Mot introuvable dans le lexique",
+          phonetics: "Non répertorié",
+          explanation: "Cette expression ne se trouve pas encore dans votre base de données locale. Vous pouvez vous rendre dans l'onglet 'Contribuer & Éditer' pour l'ajouter manuellement."
+        });
       }
-
-      const data = await response.json();
-      setTranslationResult(data);
     } catch (err: any) {
       console.error(err);
-      // Fallback response with beautiful error formatting
       setTranslationResult({
-        translation: "Une erreur s'est produite lors de la connexion linguistique.",
-        phonetics: "[ko-nek-sjon er-reur]",
-        explanation: `${err.message || "Impossible de joindre le service de traduction."}\n\nAssurez-vous que votre clé d'API Google Gemini est configurée dans le volet Secrets en haut de l'écran AI Studio.`
+        translation: "Une erreur de base de données est survenue.",
+        phonetics: "[er-reur locale]",
+        explanation: "Impossible de parcourir le lexique des utilisateurs."
       });
     } finally {
       setIsLoading(false);
@@ -292,17 +299,17 @@ export default function TranslationPage({
             <div className="flex items-center gap-1.5">
               <button 
                 onClick={handleToggleRecord}
-                className={`flex items-center gap-2 px-5 py-3 rounded-2xl transition-all cursor-pointer ${
+                className={`flex items-center gap-2 px-6 py-3.5 rounded-2xl transition-all cursor-pointer shadow-sm border ${
                   isRecording 
-                    ? "bg-rose-600 text-white animate-pulse" 
-                    : "bg-natural-accent/60 hover:bg-natural-accent text-natural-text border border-natural-border"
+                    ? "bg-rose-50 border-rose-200 text-rose-600 animate-pulse" 
+                    : "bg-white hover:bg-[#FDFBF7] text-natural-text border-natural-border"
                 }`}
-                title="Traduction orale (Microphone)"
+                title="Saisie vocale (Microphone)"
                 id="mic_trigger_btn"
               >
-                {isRecording ? <MicOff size={16} /> : <Mic size={16} />}
+                {isRecording ? <MicOff size={18} /> : <Mic size={18} />}
                 <span className="text-xs font-bold uppercase tracking-wider">
-                  {isRecording ? "Microphone Ouvert" : "Parler (Oral / Audio)"}
+                  {isRecording ? "Écoute en cours" : "Dictée vocale"}
                 </span>
               </button>
             </div>
@@ -310,15 +317,15 @@ export default function TranslationPage({
             <button
               onClick={handleTranslate}
               disabled={isLoading || !inputText.trim()}
-              className="flex items-center justify-center gap-2 bg-natural-primary hover:bg-[#5A5A40] disabled:bg-natural-accent/50 disabled:text-natural-muted text-white px-7 py-3 rounded-2xl font-serif italic font-semibold tracking-wide transition-all shadow-sm"
+              className="flex items-center justify-center gap-2 bg-[#7D8471] hover:bg-[#5A5A40] disabled:bg-neutral-200 disabled:text-neutral-400 text-white px-8 py-3.5 rounded-2xl font-serif text-sm font-bold uppercase tracking-widest transition-all shadow-md active:scale-95 cursor-pointer"
               id="translate_btn"
             >
               {isLoading ? (
-                <RefreshCw size={16} className="animate-spin" />
+                <RefreshCw size={18} className="animate-spin" />
               ) : (
-                <Sparkles size={16} />
+                <Sparkles size={18} />
               )}
-              <span>Traduire l'expression</span>
+              <span>Chercher l'équivalence</span>
             </button>
           </div>
 
@@ -378,11 +385,10 @@ export default function TranslationPage({
             </span>
 
             {isLoading ? (
-              <div className="py-16 flex flex-col items-center justify-center space-y-3">
-                <div className="w-8 h-8 border-3 border-natural-primary border-t-transparent rounded-full animate-spin"></div>
+              <div className="py-20 flex flex-col items-center justify-center space-y-4">
+                <div className="w-10 h-10 border-4 border-[#7D8471] border-t-transparent rounded-full animate-spin"></div>
                 <div className="text-center">
-                  <p className="text-sm font-bold text-[#5A5A40]">Calcul lexical de l'expression...</p>
-                  <p className="text-xs text-[#A69D91] italic font-serif">L'intelligence artificielle bilingue analyse l'étymologie</p>
+                  <p className="text-base font-bold text-[#5A5A40] font-serif">Recherche dans le lexique communautaire...</p>
                 </div>
               </div>
             ) : translationResult ? (
@@ -448,15 +454,15 @@ export default function TranslationPage({
       </div>
 
       {/* Interactive Quick Tips */}
-      <div className="bg-white rounded-3xl border border-natural-border p-6 flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
+      <div className="bg-[#7D8471] text-white rounded-3xl p-6 shadow-sm flex flex-col md:flex-row items-center justify-between gap-6">
         <div className="flex gap-4 items-center">
-          <div className="p-3 bg-natural-accent rounded-2xl text-natural-primary shrink-0">
-            <Sparkles size={20} />
+          <div className="p-3 bg-white/20 rounded-2xl text-white shrink-0">
+            <BookText size={24} />
           </div>
-          <div className="space-y-1">
-            <h4 className="text-sm font-serif font-bold text-natural-text">Un outil bilingue d'analyse intergénérationnelle</h4>
-            <p className="text-xs text-natural-muted leading-relaxed max-w-2xl">
-              Les langues maternelles abritent des sagesses indicibles par de simples mots. Notre modèle linguistique Gemini analyse le ton, les détails étymologiques, et vous aide à sauvegarder ce patrimoine oral.
+          <div className="space-y-1.5">
+            <h4 className="text-base font-serif font-bold">Un outil lexical 100% collaboratif</h4>
+            <p className="text-xs text-white/80 leading-relaxed max-w-2xl font-serif">
+              Ce dictionnaire ne dépend que de vos contributions étudiées. Allez dans l'onglet Éditeur pour enrichir le patrimoine régional de vos propres définitions et nuances de langage intimes.
             </p>
           </div>
         </div>

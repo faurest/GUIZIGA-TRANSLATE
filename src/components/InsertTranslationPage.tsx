@@ -124,38 +124,7 @@ export default function InsertTranslationPage({
     }
   };
 
-  // Pull linguistic summary from AI based on word pair
-  const handleAiDescriptionFill = async () => {
-    if (!nativeText.trim() || !frenchTranslation.trim()) {
-      setFormError("Veuillez d'abord remplir le mot d'origine et sa traduction pour que l'IA puisse générer la description.");
-      return;
-    }
-    setIsAiLoading(true);
-    setFormError("");
-
-    try {
-      const response = await fetch("/api/translate", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          text: nativeText,
-          sourceLang,
-          type: "written"
-        })
-      });
-
-      if (!response.ok) throw new Error("Impossible d'interroger Gemini.");
-      const data = await response.json();
-      setDescription(data.explanation || "Une expression linguistique typique de la région.");
-    } catch (err: any) {
-      console.error(err);
-      setDescription(`Sagesse populaire guiziga liée à l'expression "${nativeText}". S'utilise couramment pour traduire la notion de "${frenchTranslation}" dans les communications intergénérationnelles au Nord Cameroun.`);
-      setFormError("Explication standard générée (Gemini hors-ligne ou clé absente). ");
-    } finally {
-      setIsAiLoading(false);
-    }
-  };
-
+  // Removed handleAiDescriptionFill as per user request to rely purely on user memory.
   const handleEditClick = (item: TranslationEntry) => {
     setEditingEntryId(item.id);
     setNativeText(item.nativeText);
@@ -280,7 +249,7 @@ export default function InsertTranslationPage({
             Enrichissez le Glossaire Guiziga & Nord-Cameroun
           </h2>
           <p className="text-white/85 text-xs md:text-sm leading-relaxed font-serif">
-            Conservez ici les proverbes, mots sacrés ou expressions quotidiennes. Saisissez une explication d'usage ou générez-la avec l'IA. Pour l'audio, écoutez et validez votre note vocale avant d'enregistrer.
+            Conservez ici les proverbes, mots sacrés ou expressions quotidiennes. Saisissez votre explication d'usage personnalisée. Pour l'audio, écoutez et validez votre note vocale avant d'enregistrer.
           </p>
         </div>
         <div className="absolute right-0 bottom-0 opacity-10 blur-xl pointer-events-none translate-x-12 translate-y-12">
@@ -347,31 +316,15 @@ export default function InsertTranslationPage({
               />
             </div>
 
-            {/* Input Description with AI fill helper */}
+            {/* Input Description */}
             <div className="space-y-2">
-              <div className="flex justify-between items-center">
-                <label className="text-[10px] uppercase tracking-widest font-bold text-[#A69D91] block">
-                  Description & Usages <span className="text-rose-500">*</span>
-                </label>
-                <button
-                  type="button"
-                  onClick={handleAiDescriptionFill}
-                  disabled={isAiLoading || !nativeText.trim() || !frenchTranslation.trim()}
-                  className="text-[11px] font-bold text-natural-primary hover:text-[#5A5A40] disabled:text-[#A69D91] flex items-center gap-1.5 bg-[#F2E9E1] px-3 py-1.5 rounded-lg transition-colors border border-natural-dark-border cursor-pointer"
-                  title="Demander à Gemini d'expliquer ce mot bilingue"
-                >
-                  {isAiLoading ? (
-                    <RefreshCw size={11} className="animate-spin" />
-                  ) : (
-                    <Sparkles size={11} />
-                  )}
-                  <span>Rédiger avec l'IA</span>
-                </button>
-              </div>
+              <label className="text-[10px] uppercase tracking-widest font-bold text-[#A69D91] block">
+                Description & Usages (Personnalisée) <span className="text-rose-500">*</span>
+              </label>
               <textarea
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
-                placeholder="Expliquez ici le sens de ce terme : quand l'utilise-t-on ? S'agit-il d'une formule polie, intime, traditionnelle ?"
+                placeholder="Rédigez vous-même l'explication : quand l'utilise-t-on ? S'agit-il d'une formule polie, intime, traditionnelle ?"
                 className="w-full px-4 py-3 border border-natural-dark-border rounded-xl focus:ring-2 focus:ring-natural-primary outline-none transition-all text-natural-text placeholder:text-[#D9D1C7]/70 text-sm min-h-[110px] resize-none leading-relaxed bg-white font-serif"
                 required
               />
@@ -548,11 +501,11 @@ export default function InsertTranslationPage({
             {/* Submit Button */}
             <button
               type="submit"
-              className="w-full bg-[#7D8471] hover:bg-[#5A5A40] text-white py-3.5 rounded-2xl font-serif italic text-sm tracking-wide font-bold transition-all shadow-md shadow-natural-primary/10 flex items-center justify-center gap-2 cursor-pointer"
+              className="w-full bg-[#7D8471] hover:bg-[#5A5A40] text-white py-4 rounded-2xl font-serif text-sm tracking-widest uppercase font-bold transition-all shadow-md active:scale-95 flex items-center justify-center gap-2 cursor-pointer border border-[#5A5A40]"
               id="lexicon_submit_btn"
             >
-              <Plus size={16} />
-              <span>{editingEntryId ? "Enregistrer les modifications" : "Enregistrer dans mon lexique"}</span>
+              <Plus size={18} />
+              <span>{editingEntryId ? "Enregistrer les modifications" : "Ajouter à mon lexique"}</span>
             </button>
           </form>
         </div>

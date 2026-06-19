@@ -39,55 +39,8 @@ export default function App() {
       }
     }
     
-    // Initial rich starter expressions for Guiziga (Gisiga) and surrounding Far-North languages
-    return [
-      {
-        id: "guiziga-1",
-        nativeText: "Yahu, slam fika !",
-        frenchTranslation: "Bonjour, la paix soit avec toi !",
-        description: "Salutation respectueuse traditionnelle guiziga pour s'enquérir poliment de la paix dans la maison et bénir son interlocuteur au lever du soleil.",
-        type: "written",
-        category: "Salutations",
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: "guiziga-2",
-        nativeText: "Barka liyā",
-        frenchTranslation: "Merci infiniment",
-        description: "Formule guiziga de profonde gratitude couramment prononcée à l'égard de la communauté pour l'entraide festive dans le champ de mil.",
-        type: "oral",
-        category: "Politesse",
-        createdAt: new Date().toISOString(),
-        audioUrl: "simulated-voice-note-guiziga-barka"
-      },
-      {
-        id: "guiziga-3",
-        nativeText: "Mədəf gi gə diza",
-        frenchTranslation: "Une personne bienveillante / bon cœur",
-        description: "Éloge culturel de sagesse guiziga pour désigner l'altruisme légendaire et le don de soi d'un habitant de la communauté.",
-        type: "written",
-        category: "Sagesse",
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: "fulfulde-1",
-        nativeText: "Jam bandu? Jam kɔddɔ.",
-        frenchTranslation: "Comment va la santé? Seule la paix règne.",
-        description: "L'une des salutations les plus usitées par les populations du Nord et de l'Extrême-Nord Cameroun (Peuls et commerçants) pour s'enquérir de la force vitale.",
-        type: "written",
-        category: "Salutations",
-        createdAt: new Date().toISOString()
-      },
-      {
-        id: "mafa-1",
-        nativeText: "Slam fika, maza mey?",
-        frenchTranslation: "Bonjour, comment se portent tes proches?",
-        description: "Formule de salutation mafa typique des monts Mandara, signifiant le respect immédiat et l'importance accordée à la santé de la famille élargie.",
-        type: "written",
-        category: "Salutations",
-        createdAt: new Date().toISOString()
-      }
-    ];
+    // Start with an empty dictionary as requested, so the user can entirely personalize it.
+    return [];
   });
 
   // Persist dictionary state
@@ -176,7 +129,7 @@ export default function App() {
               id="tab_btn_examples"
             >
               <BookOpenCheck size={15} />
-              <span>Contextes (IA)</span>
+              <span>Explorateur</span>
             </button>
             <button
               onClick={() => setActiveTab("culture")}
@@ -245,6 +198,7 @@ export default function App() {
                   sourceLang={sourceLang} 
                   setSourceLang={setSourceLang}
                   onSaveToDictionary={handleSaveToDictionaryFromTranslator}
+                  dictionary={dictionary}
                 />
               )}
 
@@ -289,6 +243,7 @@ export default function App() {
                 sourceLang={sourceLang} 
                 setSourceLang={setSourceLang}
                 onSaveToDictionary={handleSaveToDictionaryFromTranslator}
+                dictionary={dictionary}
               />
             )}
 
