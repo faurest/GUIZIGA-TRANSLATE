@@ -38,8 +38,11 @@ export default function TranslationPage({
     translation: string;
     phonetics?: string;
     explanation: string;
+    audioUrl?: string;
+    suggestions?: TranslationEntry[];
+    originalMatch?: TranslationEntry;
   } | null>(null);
-  
+
   const [savedSuccess, setSavedSuccess] = useState(false);
 
   // References for Speech Recognition API
@@ -59,6 +62,26 @@ export default function TranslationPage({
 
   const [customLangInput, setCustomLangInput] = useState(false);
   const [isReversed, setIsReversed] = useState(false);
+
+  // Levenshtein distance for typo tolerance
+  const levenshteinDistance = (a: string, b: string): number => {
+    if (a.length === 0) return b.length;
+    if (b.length === 0) return a.length;
+    const matrix = Array(b.length + 1).fill(null).map(() => Array(a.length + 1).fill(null));
+    for (let i = 0; i <= a.length; i++) matrix[0][i] = i;
+    for (let j = 0; j <= b.length; j++) matrix[j][0] = j;
+    for (let j = 1; j <= b.length; j++) {
+      for (let i = 1; i <= a.length; i++) {
+        const indicator = a[i - 1] === b[j - 1] ? 0 : 1;
+        matrix[j][i] = Math.min(
+          matrix[j][i - 1] + 1,
+          matrix[j - 1][i] + 1,
+          matrix[j - 1][i - 1] + indicator
+        );
+      }
+    }
+    return matrix[b.length][a.length];
+  };
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -152,22 +175,40 @@ export default function TranslationPage({
       await new Promise(resolve => setTimeout(resolve, 500));
 
       const query = inputText.toLowerCase().trim();
-      const match = dictionary.find(entry => 
+      const directMatch = dictionary.find(entry => 
+        entry.nativeText.toLowerCase() === query || 
+        entry.frenchTranslation.toLowerCase() === query
+      );
+      
+      const partialMatch = dictionary.find(entry => 
         entry.nativeText.toLowerCase().includes(query) || 
         entry.frenchTranslation.toLowerCase().includes(query)
       );
+
+      const match = directMatch || partialMatch;
 
       if (match) {
         setTranslationResult({
           translation: isReversed ? match.nativeText : match.frenchTranslation,
           phonetics: "Source : Lexique communautaire",
-          explanation: match.description
+          explanation: match.description,
+          audioUrl: match.audioUrl,
+          originalMatch: match
         });
       } else {
+        const suggestions = dictionary.filter(entry => {
+          const ldNative = levenshteinDistance(entry.nativeText.toLowerCase(), query);
+          const ldFrench = levenshteinDistance(entry.frenchTranslation.toLowerCase(), query);
+          // Tighten threshold to avoid too many random matches
+          const threshold = query.length > 6 ? 3 : (query.length > 3 ? 2 : 1);
+          return (ldNative > 0 && ldNative <= threshold) || (ldFrench > 0 && ldFrench <= threshold);
+        }).slice(0, 3);
+
         setTranslationResult({
           translation: "Mot introuvable dans le lexique",
           phonetics: "Non répertorié",
-          explanation: "Cette expression ne se trouve pas encore dans votre base de données locale. Vous pouvez vous rendre dans l'onglet 'Contribuer & Éditer' pour l'ajouter manuellement."
+          explanation: suggestions.length > 0 ? "Nous n'avons pas trouvé cette expression exacte, mais voici quelques suggestions proches :" : "Cette expression ne se trouve pas encore dans votre base de données locale. Vous pouvez vous rendre dans l'onglet 'Contribuer & Éditer' pour l'ajouter manuellement.",
+          suggestions: suggestions.length > 0 ? suggestions : undefined
         });
       }
     } catch (err: any) {
@@ -184,6 +225,13 @@ export default function TranslationPage({
 
   const speakTranslation = () => {
     if (!translationResult || !translationResult.translation) return;
+
+    if (translationResult.audioUrl && translationResult.audioUrl.startsWith('data:audio')) {
+      const audio = new Audio(translationResult.audioUrl);
+      audio.play().catch(e => console.error("Could not play audio", e));
+      return;
+    }
+
     if ("speechSynthesis" in window) {
       const utterance = new SpeechSynthesisUtterance(translationResult.translation);
       utterance.lang = "fr-FR";
@@ -422,6 +470,33 @@ export default function TranslationPage({
                   <p className="text-[#4A3E37]/90 text-sm whitespace-pre-wrap leading-relaxed font-serif">
                     {translationResult.explanation}
                   </p>
+                  
+                  {translationResult.suggestions && translationResult.suggestions.length > 0 && (
+                    <div className="mt-4 pt-4 border-t border-[#E5E0D8] space-y-3">
+                      <span className="text-xs font-bold text-natural-secondary block">Propositions :</span>
+                      <div className="flex flex-wrap gap-2">
+                        {translationResult.suggestions.map((sg, idx) => (
+                           <button
+                             key={idx}
+                             onClick={() => {
+                               const text = isReversed ? sg.frenchTranslation : sg.nativeText;
+                               setInputText(text);
+                               setTranslationResult({
+                                 translation: isReversed ? sg.nativeText : sg.frenchTranslation,
+                                 phonetics: "Source : Lexique communautaire",
+                                 explanation: sg.description,
+                                 audioUrl: sg.audioUrl,
+                                 originalMatch: sg
+                               });
+                             }}
+                             className="text-xs md:text-sm bg-[#F2E9E1] text-[#5A5A40] px-4 py-2 rounded-xl border border-natural-border font-medium hover:bg-[#EAE5DD] hover:text-[#4A4A20] transition-colors cursor-pointer shadow-sm"
+                           >
+                             {isReversed ? sg.frenchTranslation : sg.nativeText}
+                           </button>
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             ) : (
