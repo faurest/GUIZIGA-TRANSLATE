@@ -17,7 +17,7 @@ export interface TranslationEntry {
   examples?: UsageExample[];
 }
 
-export type TabType = 'translate' | 'insert' | 'examples' | 'culture' | 'apk';
+export type TabType = 'translate' | 'insert' | 'examples' | 'culture' | 'apk' | 'transcription';
 
 export interface TranslationRequest {
   text: string;

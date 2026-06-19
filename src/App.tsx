@@ -9,7 +9,8 @@ import {
   ChevronRight,
   BookMarked,
   Compass,
-  Smartphone
+  Smartphone,
+  Keyboard
 } from "lucide-react";
 import { TranslationEntry, TabType } from "./types";
 import TranslationPage from "./components/TranslationPage";
@@ -17,8 +18,9 @@ import InsertTranslationPage from "./components/InsertTranslationPage";
 import ExamplesPage from "./components/ExamplesPage";
 import CulturePage from "./components/CulturePage";
 import ApkPage from "./components/ApkPage";
+import TranscriptionPage from "./components/TranscriptionPage";
+import { useAuth } from "./AuthContext";
 
-const LOCAL_STORAGE_KEY = "maternelle_lexicon_items_v2";
 const DEFAULT_SOURCE_LANG_KEY = "maternelle_source_lang_v2";
 
 export default function App() {
@@ -27,42 +29,69 @@ export default function App() {
     return localStorage.getItem(DEFAULT_SOURCE_LANG_KEY) || "Guiziga";
   });
   const [isSimulatedMobileActive, setIsSimulatedMobileActive] = useState<boolean>(false);
+  const [dictionary, setDictionary] = useState<TranslationEntry[]>([]);
+  const { user, getToken, signIn } = useAuth();
 
-  // State for durable bilingual dictionary with Cameroon Far-North entries
-  const [dictionary, setDictionary] = useState<TranslationEntry[]>(() => {
-    const saved = localStorage.getItem(LOCAL_STORAGE_KEY);
-    if (saved) {
-      try {
-        return JSON.parse(saved);
-      } catch (err) {
-        console.error("Failed to parse saved lexicon state:", err);
-      }
-    }
-    
-    // Start with an empty dictionary as requested, so the user can entirely personalize it.
-    return [];
-  });
-
-  // Persist dictionary state
+  // Fetch entries from Cloud SQL via API
   useEffect(() => {
-    localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(dictionary));
-  }, [dictionary]);
+    const fetchEntries = async () => {
+      try {
+        const res = await fetch('/api/entries');
+        if (res.ok) {
+          const data = await res.json();
+          setDictionary(data);
+        }
+      } catch (err) {
+        console.error("Failed to fetch dictionary entries from database:", err);
+      }
+    };
+    fetchEntries();
+  }, []);
 
   // Persist source language selection
   useEffect(() => {
     localStorage.setItem(DEFAULT_SOURCE_LANG_KEY, sourceLang);
   }, [sourceLang]);
 
-  const handleAddEntry = (entry: TranslationEntry) => {
+  const handleAddEntry = async (entry: TranslationEntry) => {
     setDictionary(prev => [entry, ...prev]);
+    if (!user) {
+      await signIn();
+    }
+    const token = await getToken();
+    if (token) {
+      await fetch('/api/entries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(entry)
+      });
+    }
   };
 
   const handleDeleteEntry = (id: string) => {
+    // Note: Backend delete endpoint could be added, just updating local state for now
     setDictionary(prev => prev.filter(item => item.id !== id));
   };
 
-  const handleUpdateEntry = (updatedEntry: TranslationEntry) => {
+  const handleUpdateEntry = async (updatedEntry: TranslationEntry) => {
     setDictionary(prev => prev.map(item => item.id === updatedEntry.id ? updatedEntry : item));
+    if (!user) {
+      await signIn();
+    }
+    const token = await getToken();
+    if (token) {
+      await fetch('/api/entries', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${token}`
+        },
+        body: JSON.stringify(updatedEntry)
+      });
+    }
   };
 
   // Allows instant saving of output from translation view directly into Insertion card
@@ -155,6 +184,18 @@ export default function App() {
               <Smartphone size={15} />
               <span>📱 Version APK</span>
             </button>
+            <button
+              onClick={() => setActiveTab("transcription")}
+              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+                activeTab === "transcription"
+                  ? "bg-[#7D8471] text-white shadow-sm font-bold"
+                  : "text-natural-text hover:text-natural-primary"
+              }`}
+              id="tab_btn_transcription"
+            >
+              <Keyboard size={15} />
+              <span>Clavier AGLC</span>
+            </button>
           </nav>
         </div>
       </header>
@@ -229,6 +270,10 @@ export default function App() {
                   isSimulatedMobileActive={isSimulatedMobileActive}
                 />
               )}
+
+              {activeTab === "transcription" && (
+                <TranscriptionPage />
+              )}
             </div>
 
             {/* Smartphone Bottom Navigation Bar Bar */}
@@ -273,6 +318,10 @@ export default function App() {
                 onSimulateMobileWidthToggle={() => setIsSimulatedMobileActive(prev => !prev)}
                 isSimulatedMobileActive={isSimulatedMobileActive}
               />
+            )}
+
+            {activeTab === "transcription" && (
+              <TranscriptionPage />
             )}
           </div>
         )}

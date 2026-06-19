@@ -6,11 +6,78 @@ import { createServer as createViteServer } from "vite";
 // Load environment variables
 dotenv.config();
 
+// Fixes missing TS config errors if we use ESM
+import { requireAuth } from "./src/middleware/auth.ts";
+import { db } from "./src/db/index.ts";
+import { translationEntries, users } from "./src/db/schema.ts";
+import { desc } from "drizzle-orm";
+
 const app = express();
 const PORT = 3000;
 
 // Middleware for JSON parsing
 app.use(express.json({ limit: "15mb" }));
+
+app.post('/api/sync-user', requireAuth, async (req: any, res: any) => {
+  try {
+    const uid = req.user.uid;
+    const email = req.user.email || '';
+    const result = await db.insert(users)
+      .values({ id: uid, email })
+      .onConflictDoUpdate({
+        target: users.id,
+        set: { email }
+      })
+      .returning();
+    res.json(result[0]);
+  } catch (error: any) {
+    console.error("Sync user error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.get('/api/entries', async (req, res) => {
+  try {
+    const result = await db.select().from(translationEntries).orderBy(desc(translationEntries.createdAt));
+    res.json(result);
+  } catch (error: any) {
+    console.error("Get entries error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
+
+app.post('/api/entries', requireAuth, async (req: any, res: any) => {
+  try {
+    const { id, nativeText, frenchTranslation, description, type, category, audioUrl, examples } = req.body;
+    const userId = req.user.uid;
+    const result = await db.insert(translationEntries).values({
+      id,
+      nativeText,
+      frenchTranslation,
+      description,
+      type,
+      category,
+      audioUrl,
+      examples,
+      userId
+    }).onConflictDoUpdate({
+      target: translationEntries.id,
+      set: {
+        nativeText,
+        frenchTranslation,
+        description,
+        type,
+        category,
+        audioUrl,
+        examples
+      }
+    }).returning();
+    res.json(result[0]);
+  } catch(error: any) {
+    console.error("Save entry error:", error);
+    res.status(500).json({ error: error.message });
+  }
+});
 
 // Removed Gemini API configuration and /api/translate, /api/generate-context endpoints.
 // The frontend strictly uses local data for dictionary translation as per the user's constraints.
