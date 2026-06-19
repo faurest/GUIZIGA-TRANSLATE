@@ -58,6 +58,7 @@ export default function TranslationPage({
   ];
 
   const [customLangInput, setCustomLangInput] = useState(false);
+  const [isReversed, setIsReversed] = useState(false);
 
   // Initialize Speech Recognition
   useEffect(() => {
@@ -128,11 +129,10 @@ export default function TranslationPage({
     setRecognitionError("");
     setTimeout(() => {
       const phrasesSimulation = [
-        "Yahu, slam fika !",
-        "Barka liyā",
-        "Mədəf gi gə diza",
-        "Dza baka !",
-        "Fou fika?"
+        "Mamba kula'a viŋ",
+        "Kiyamarava",
+        "Yaw ati gonoko a ram nga zligi",
+        "gusoŋ vulaŋdi ɗuwa"
       ];
       const randomPhrase = phrasesSimulation[Math.floor(Math.random() * phrasesSimulation.length)];
       setInputText(randomPhrase);
@@ -159,7 +159,7 @@ export default function TranslationPage({
 
       if (match) {
         setTranslationResult({
-          translation: match.frenchTranslation,
+          translation: isReversed ? match.nativeText : match.frenchTranslation,
           phonetics: "Source : Lexique communautaire",
           explanation: match.description
         });
@@ -197,8 +197,8 @@ export default function TranslationPage({
   const handleSaveToDict = () => {
     if (!translationResult) return;
     onSaveToDictionary({
-      nativeText: inputText,
-      frenchTranslation: translationResult.translation,
+      nativeText: isReversed ? translationResult.translation : inputText,
+      frenchTranslation: isReversed ? inputText : translationResult.translation,
       description: translationResult.explanation,
       type: isRecording ? "oral" : "written",
       category: "Général",
@@ -218,9 +218,19 @@ export default function TranslationPage({
           </div>
           <h2 className="text-xl font-serif text-natural-text flex items-center gap-2">
             <span>Traducteur</span>
-            <span className="px-3 py-1 rounded-full bg-natural-accent text-natural-secondary text-xs font-serif italic border border-natural-dark-border">{sourceLang}</span>
-            <ArrowRight size={16} className="text-natural-muted" />
-            <span className="px-3 py-1 rounded-full bg-natural-primary text-white text-xs font-serif italic">Français</span>
+            <span className="px-3 py-1 rounded-full bg-natural-accent text-natural-secondary text-xs font-serif italic border border-natural-dark-border">
+              {isReversed ? "Français" : sourceLang}
+            </span>
+            <button 
+              onClick={() => setIsReversed(!isReversed)}
+              className="p-1 hover:bg-natural-border rounded-full transition-colors cursor-pointer"
+              title="Inverser les langues"
+            >
+              <ArrowRightLeft size={16} className="text-natural-muted hover:text-natural-primary" />
+            </button>
+            <span className="px-3 py-1 rounded-full bg-natural-primary text-white text-xs font-serif italic">
+              {isReversed ? sourceLang : "Français"}
+            </span>
           </h2>
         </div>
 
@@ -272,7 +282,7 @@ export default function TranslationPage({
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <span className="text-[10px] uppercase tracking-widest font-bold text-[#A69D91]">
-                Source ({sourceLang})
+                Source ({isReversed ? "Français" : sourceLang})
               </span>
               <div className="flex gap-1">
                 <button 
@@ -287,7 +297,7 @@ export default function TranslationPage({
 
             <textarea
               className="w-full text-xl md:text-2xl font-serif text-natural-text placeholder:text-[#D9D1C7] resize-none outline-none border-none min-h-[160px] focus:ring-0 leading-relaxed"
-              placeholder={`Commencez à rédiger en ${sourceLang}... (ex: "Wôlôf laa dëkk" ou tapotez sur Traduction Orale)`}
+              placeholder={`Commencez à rédiger en ${isReversed ? "Français" : sourceLang}...`}
               value={inputText}
               onChange={(e) => setInputText(e.target.value)}
               id="source_textarea"
@@ -381,7 +391,7 @@ export default function TranslationPage({
         <div className="bg-[#F2E9E1]/30 border border-natural-dark-border rounded-3xl p-6 min-h-[340px] flex flex-col justify-between" id="destination_panel">
           <div className="space-y-4">
             <span className="text-[10px] uppercase tracking-widest font-bold text-[#A69D91]">
-              Traduction (Français)
+              Traduction ({isReversed ? sourceLang : "Français"})
             </span>
 
             {isLoading ? (

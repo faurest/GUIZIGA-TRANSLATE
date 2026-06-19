@@ -22,38 +22,36 @@ export default function ExamplesPage({ sourceLang, dictionary }: ExamplesPagePro
   const defaultDialogues = [
     {
       id: "1",
-      title: "Saluer poliment au lever du jour",
-      category: "Salutations",
-      context: "Formules verbales et réponses attendues pour marquer le respect envers un aîné au réveil en pays Guiziga.",
+      title: "Récit traditionnel",
+      category: "Contes",
+      context: "Formules narratives pour introduire un conte ou partager un récit ancien.",
       dialogue: [
-        { native: "Yahu, slam fika, bābā.", french: "Bonjour, que la paix soit avec toi, mon père.", speaker: "Visiteur" },
-        { native: "Slam fika ! Barka fika kə tana.", french: "La paix avec toi aussi ! Merci pour ton réveil matinal.", speaker: "Aîné" },
-        { native: "Fou fika? Fou godo ?", french: "Comment vas-tu? Comment va la concession ?", speaker: "Visiteur" }
+        { native: "Mamba kula'a viŋ", french: "Une grand-mère", speaker: "Conteur" },
+        { native: "kula'a hudul waɗ put deŋ avra", french: "Il y a longtemps, offrit un animal", speaker: "Conteur" }
       ]
     },
     {
       id: "2",
-      title: "Entraide agricole et moisson de mil",
-      category: "Agriculture",
-      context: "Formule de remerciement et d'encouragement après une journée de travail collectif dans les champs de sorgho.",
+      title: "Échange de noms",
+      category: "Accueil",
+      context: "Discuter des noms et des personnes.",
       dialogue: [
-        { native: "Barka liyā kə mah gə diza !", french: "Merci infiniment pour ce superbe labeur dans la plantation !", speaker: "Chef de famille" },
-        { native: "Mədəf gi gə diza na, a ma ti kə dza !", french: "Une personne bienveillante mérite qu'on l'aide à bras ouverts !", speaker: "Voisin" }
+        { native: "Yaw ati gonoko a ram nga zligi", french: "Je et toi nous avons des noms", speaker: "Personne A" }
       ]
     },
     {
       id: "3",
-      title: "Échange cordial de bienvenue",
-      category: "Accueil",
-      context: "Quand un visiteur ou un voyageur arrive dans la concession ou chez vous.",
+      title: "Vocabulaire quotidien",
+      category: "Quotidien",
+      context: "Exemples de mots d'usage courant.",
       dialogue: [
-        { native: "Dza baka ! Slam fika ti dabor.", french: "Sois le bienvenu ! Que la paix guide tes pas au foyer.", speaker: "Hôte" },
-        { native: "Barka ! Slam fika tana kə dza.", french: "Merci ! Que la paix soit avec toi également.", speaker: "Visiteur" }
+        { native: "Kiyamarava", french: "Le mois de janvier", speaker: "Locuteur" },
+        { native: "gusoŋ vulaŋdi ɗuwa", french: "Un repas avec du lait", speaker: "Locuteur" }
       ]
     }
   ];
 
-  const categoriesSet = ["Tous", "Salutations", "Agriculture", "Accueil"];
+  const categoriesSet = ["Tous", "Contes", "Quotidien", "Accueil"];
   
   const selectedEntry = dictionary.find(e => e.id === selectedWordId);
 

@@ -295,7 +295,7 @@ export default function InsertTranslationPage({
                 type="text"
                 value={nativeText}
                 onChange={(e) => setNativeText(e.target.value)}
-                placeholder="Ex: Yahu, Slam fika, Barka liyā..."
+                placeholder="Ex: Mamba, Kiyamarava, slimiɗ..."
                 className="w-full px-4 py-3 border border-natural-dark-border rounded-xl focus:ring-2 focus:ring-natural-primary outline-none transition-all text-natural-text placeholder:text-[#D9D1C7]/70 font-serif font-medium text-sm bg-white"
                 required
               />

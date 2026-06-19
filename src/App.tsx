@@ -123,78 +123,79 @@ export default function App() {
           </div>
 
           {/* Tab Navigation */}
-          <nav className="flex flex-wrap items-center bg-[#EAE5DD]/60 p-1.5 rounded-2xl border border-natural-border gap-1" id="main_tabs">
+          <nav className="flex w-full sm:w-auto overflow-x-auto no-scrollbar sm:flex-wrap items-center bg-[#EAE5DD]/60 p-1.5 rounded-2xl border border-natural-border gap-1 shadow-inner h-full shrink-0 snap-x" id="main_tabs">
             <button
               onClick={() => setActiveTab("translate")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex shrink-0 snap-start items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
                 activeTab === "translate"
-                  ? "bg-natural-primary text-white shadow-sm"
-                  : "text-natural-text hover:text-natural-primary"
+                  ? "bg-gradient-to-br from-natural-primary to-[#5A5A40] text-white shadow-md scale-100 ring-1 ring-white/20"
+                  : "text-natural-secondary hover:text-natural-text hover:bg-white/50 scale-95 hover:scale-100"
               }`}
               id="tab_btn_translate"
             >
-              <Languages size={15} />
+              <Languages size={15} className={activeTab === "translate" ? "scale-110" : "opacity-70"} />
               <span>Traduire</span>
             </button>
             <button
               onClick={() => setActiveTab("insert")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex shrink-0 snap-start items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
                 activeTab === "insert"
-                  ? "bg-natural-primary text-white shadow-sm"
-                  : "text-natural-text hover:text-natural-primary"
+                  ? "bg-gradient-to-br from-natural-primary to-[#5A5A40] text-white shadow-md scale-100 ring-1 ring-white/20"
+                  : "text-natural-secondary hover:text-natural-text hover:bg-white/50 scale-95 hover:scale-100"
               }`}
               id="tab_btn_insert"
             >
-              <PlusCircle size={15} />
+              <PlusCircle size={15} className={activeTab === "insert" ? "scale-110" : "opacity-70"} />
               <span>Contribuer & Éditer</span>
             </button>
             <button
               onClick={() => setActiveTab("examples")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex shrink-0 snap-start items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
                 activeTab === "examples"
-                  ? "bg-natural-primary text-white shadow-sm"
-                  : "text-natural-text hover:text-natural-primary"
+                  ? "bg-gradient-to-br from-natural-primary to-[#5A5A40] text-white shadow-md scale-100 ring-1 ring-white/20"
+                  : "text-natural-secondary hover:text-natural-text hover:bg-white/50 scale-95 hover:scale-100"
               }`}
               id="tab_btn_examples"
             >
-              <BookOpenCheck size={15} />
+              <BookOpenCheck size={15} className={activeTab === "examples" ? "scale-110" : "opacity-70"} />
               <span>Explorateur</span>
             </button>
             <button
               onClick={() => setActiveTab("culture")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex shrink-0 snap-start items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
                 activeTab === "culture"
-                  ? "bg-natural-primary text-white shadow-sm"
-                  : "text-natural-text hover:text-natural-primary"
+                  ? "bg-gradient-to-br from-natural-primary to-[#5A5A40] text-white shadow-md scale-100 ring-1 ring-white/20"
+                  : "text-natural-secondary hover:text-natural-text hover:bg-white/50 scale-95 hover:scale-100"
               }`}
               id="tab_btn_culture"
             >
-              <Compass size={15} />
+              <Compass size={15} className={activeTab === "culture" ? "scale-110" : "opacity-70"} />
               <span>Peuple & Culture</span>
             </button>
-            <button
-              onClick={() => setActiveTab("apk")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
-                activeTab === "apk"
-                  ? "bg-[#7D8471] text-white shadow-sm font-bold"
-                  : "text-natural-text hover:text-natural-primary"
-              }`}
-              id="tab_btn_apk"
-            >
-              <Smartphone size={15} />
-              <span>📱 Version APK</span>
-            </button>
+            <div className="w-px h-6 bg-natural-border mx-1 hidden sm:block"></div>
             <button
               onClick={() => setActiveTab("transcription")}
-              className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all cursor-pointer ${
+              className={`flex shrink-0 snap-start items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
                 activeTab === "transcription"
-                  ? "bg-[#7D8471] text-white shadow-sm font-bold"
-                  : "text-natural-text hover:text-natural-primary"
+                  ? "bg-gradient-to-tl from-[#5A5A40] to-natural-primary text-white shadow-md scale-100 ring-1 ring-white/20"
+                  : "text-[#5A5A40] hover:text-[#4A4A20] hover:bg-[#5A5A40]/10 scale-95 hover:scale-100"
               }`}
               id="tab_btn_transcription"
             >
-              <Keyboard size={15} />
+              <Keyboard size={15} className={activeTab === "transcription" ? "scale-110" : "opacity-70"} />
               <span>Clavier AGLC</span>
+            </button>
+            <button
+              onClick={() => setActiveTab("apk")}
+              className={`flex shrink-0 snap-start items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
+                activeTab === "apk"
+                  ? "bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-md scale-100 ring-1 ring-emerald-400"
+                  : "text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 scale-95 hover:scale-100"
+              }`}
+              id="tab_btn_apk"
+            >
+              <Smartphone size={15} className={activeTab === "apk" ? "scale-110" : "opacity-70"} />
+              <span>Version APK</span>
             </button>
           </nav>
         </div>

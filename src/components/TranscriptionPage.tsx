@@ -61,10 +61,10 @@ export default function TranscriptionPage() {
         </div>
       </div>
 
-      <div className="flex border-b border-natural-border pb-px gap-2">
+      <div className="flex w-full overflow-x-auto no-scrollbar border-b border-natural-border pb-px gap-2">
         <button
           onClick={() => setActiveTab("tool")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex shrink-0 items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
             activeTab === "tool"
               ? "border-[#7D8471] text-[#7D8471] font-bold bg-[#FDFBF7]"
               : "border-transparent text-natural-muted hover:text-natural-text"
@@ -75,7 +75,7 @@ export default function TranscriptionPage() {
         </button>
         <button
           onClick={() => setActiveTab("guide")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex shrink-0 items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
             activeTab === "guide"
               ? "border-[#7D8471] text-[#7D8471] font-bold bg-[#FDFBF7]"
               : "border-transparent text-natural-muted hover:text-natural-text"

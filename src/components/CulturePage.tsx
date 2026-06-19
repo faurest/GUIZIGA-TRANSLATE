@@ -19,12 +19,12 @@ export default function CulturePage() {
   const [audioFeedback, setAudioFeedback] = useState<string | null>(null);
 
   const culturalExpressions = [
-    { native: "Yahu !", translation: "Bonjour !", usage: "Salutation universelle matinale et journalière pour saluer avec respect." },
-    { native: "Slam fika !", translation: "La paix soit avec toi !", usage: "Formule d'accueil solennelle marquant la bienveillance mutuelle." },
-    { native: "Barka", translation: "Merci / Félicitations", usage: "Utilisé pour exprimer la gratitude ou bénir l'action de quelqu'un." },
-    { native: "Barka liyā", translation: "Merci infiniment", usage: "Une expression d'une grande politesse après un service ou une aide précieuse." },
-    { native: "Dza baka !", translation: "Sois le bienvenu !", usage: "Formule prononcée lorsqu'un visiteur franchit le seuil de la concession." },
-    { native: "Fou fika?", translation: "Comment vas-tu ?", usage: "Façon affectueuse et quotidienne de demander des nouvelles à ses proches." }
+    { native: "Bumbulvuŋ", translation: "Dieu", usage: "Utilisé pour désigner le créateur ou le principe divin." },
+    { native: "Mamba", translation: "Grand-mère", usage: "Terme de respect et de tendresse pour une aïeule." },
+    { native: "Kiyamarava", translation: "Mois de janvier", usage: "Marque le début de l'année dans le calendrier usuel." },
+    { native: "slimiɗ", translation: "Nom", usage: "L'identité de la personne portée avec fierté." },
+    { native: "gusoŋ", translation: "Repas", usage: "Moment de partage familial central." },
+    { native: "gbɛ", translation: "Terre", usage: "Le sol, notre patrimoine séculaire." }
   ];
 
   const handlePlayCulturalAudio = (text: string) => {
@@ -63,21 +63,21 @@ export default function CulturePage() {
       </div>
 
       {/* Navigation for culture details */}
-      <div className="flex flex-wrap border-b border-natural-border pb-px gap-2" id="culture_tabs">
+      <div className="flex w-full overflow-x-auto no-scrollbar border-b border-natural-border pb-px gap-2" id="culture_tabs">
         <button
           onClick={() => setActiveSubTab("history")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex shrink-0 items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
             activeSubTab === "history"
               ? "border-[#7D8471] text-[#7D8471] font-bold bg-[#FDFBF7]"
               : "border-transparent text-natural-muted hover:text-natural-text"
           }`}
         >
-          <BookOpen size={16} />
+          <BookOpen  size={16} />
           <span>Origines & Histoire</span>
         </button>
         <button
           onClick={() => setActiveSubTab("geography")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex shrink-0 items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
             activeSubTab === "geography"
               ? "border-[#7D8471] text-[#7D8471] font-bold bg-[#FDFBF7]"
               : "border-transparent text-natural-muted hover:text-natural-text"
@@ -88,7 +88,7 @@ export default function CulturePage() {
         </button>
         <button
           onClick={() => setActiveSubTab("traditions")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex shrink-0 items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
             activeSubTab === "traditions"
               ? "border-[#7D8471] text-[#7D8471] font-bold bg-[#FDFBF7]"
               : "border-transparent text-natural-muted hover:text-natural-text"
@@ -99,7 +99,7 @@ export default function CulturePage() {
         </button>
         <button
           onClick={() => setActiveSubTab("renaissance")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex shrink-0 items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
             activeSubTab === "renaissance"
               ? "border-[#7D8471] text-[#7D8471] font-bold bg-[#FDFBF7]"
               : "border-transparent text-natural-muted hover:text-natural-text"
@@ -110,7 +110,7 @@ export default function CulturePage() {
         </button>
         <button
           onClick={() => setActiveSubTab("linguistics")}
-          className={`flex items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
+          className={`flex shrink-0 items-center gap-2 px-6 py-3 border-b-2 font-serif text-sm font-semibold transition-all cursor-pointer ${
             activeSubTab === "linguistics"
               ? "border-[#7D8471] text-[#7D8471] font-bold bg-[#FDFBF7]"
               : "border-transparent text-natural-muted hover:text-natural-text"
