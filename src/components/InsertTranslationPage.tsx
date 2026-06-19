@@ -17,7 +17,8 @@ import {
   Edit3,
   Play,
   Check,
-  X
+  X,
+  Upload
 } from "lucide-react";
 import { TranslationEntry } from "../types";
 
@@ -49,14 +50,17 @@ export default function InsertTranslationPage({
   // Editing state
   const [editingEntryId, setEditingEntryId] = useState<string | null>(null);
 
-  // Audio simulation and validation states
+  // Real Audio recording and validation states
   const [isRecordingAudio, setIsRecordingAudio] = useState(false);
-  const [simulatedAudioRegistered, setSimulatedAudioRegistered] = useState(false);
+  const [audioDataUrl, setAudioDataUrl] = useState<string | null>(null);
   const [recordingDuration, setRecordingDuration] = useState(0);
   const [isAudioListeningOccurred, setIsAudioListeningOccurred] = useState(false);
   const [isAudioValidated, setIsAudioValidated] = useState(false);
   
   const recordingTimerRef = useRef<any>(null);
+  const mediaRecorderRef = useRef<MediaRecorder | null>(null);
+  const audioChunksRef = useRef<Blob[]>([]);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Search local lexicon entries
   const [searchTerm, setSearchTerm] = useState("");
@@ -73,35 +77,85 @@ export default function InsertTranslationPage({
     "Autre"
   ];
 
-  const handleStartSimulateRecording = () => {
-    setIsRecordingAudio(true);
-    setRecordingDuration(0);
-    setIsAudioValidated(false);
-    setIsAudioListeningOccurred(false);
-    recordingTimerRef.current = setInterval(() => {
-      setRecordingDuration(prev => prev + 1);
-    }, 1000);
+  const handleStartRecording = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      const mediaRecorder = new MediaRecorder(stream);
+      mediaRecorderRef.current = mediaRecorder;
+      audioChunksRef.current = [];
+
+      mediaRecorder.ondataavailable = (event) => {
+        if (event.data.size > 0) {
+          audioChunksRef.current.push(event.data);
+        }
+      };
+
+      mediaRecorder.onstop = () => {
+        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const reader = new FileReader();
+        reader.readAsDataURL(audioBlob);
+        reader.onloadend = () => {
+          if (reader.result) {
+            setAudioDataUrl(reader.result.toString());
+            setType("oral");
+          }
+        };
+        stream.getTracks().forEach(track => track.stop());
+      };
+
+      mediaRecorder.start();
+      setIsRecordingAudio(true);
+      setRecordingDuration(0);
+      setIsAudioValidated(false);
+      setIsAudioListeningOccurred(false);
+      setAudioDataUrl(null);
+      
+      recordingTimerRef.current = setInterval(() => {
+        setRecordingDuration(prev => prev + 1);
+      }, 1000);
+    } catch (err) {
+      console.error("Microphone access denied or error:", err);
+      setFormError("Impossible d'accéder au microphone.");
+    }
   };
 
-  const handleStopSimulateRecording = () => {
+  const handleStopRecording = () => {
+    if (mediaRecorderRef.current && mediaRecorderRef.current.state === "recording") {
+      mediaRecorderRef.current.stop();
+    }
     if (recordingTimerRef.current) {
       clearInterval(recordingTimerRef.current);
     }
     setIsRecordingAudio(false);
-    setSimulatedAudioRegistered(true);
-    setType("oral");
+  };
+
+  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    
+    if (!file.type.startsWith('audio/')) {
+      setFormError("Veuillez sélectionner un fichier audio valide.");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onloadend = () => {
+      if (reader.result) {
+        setAudioDataUrl(reader.result.toString());
+        setType("oral");
+        setIsAudioValidated(false);
+        setIsAudioListeningOccurred(false);
+      }
+    };
   };
 
   // Playback recorded sample for validation
   const handleListenRecordedSample = () => {
-    setIsAudioListeningOccurred(true);
-    if ("speechSynthesis" in window) {
-      window.speechSynthesis.cancel();
-      // Speak the entered native word to let them hear their "voice sample"
-      const utterance = new SpeechSynthesisUtterance(nativeText || "Échantillon");
-      utterance.lang = "fr-FR";
-      utterance.rate = 0.85;
-      window.speechSynthesis.speak(utterance);
+    if (audioDataUrl) {
+       setIsAudioListeningOccurred(true);
+       const audio = new Audio(audioDataUrl);
+       audio.play().catch(e => console.error("Error playing audio", e));
     }
   };
 
@@ -135,12 +189,16 @@ export default function InsertTranslationPage({
     setFormError("");
     setFormSuccess(false);
 
-    if (item.audioUrl) {
-      setSimulatedAudioRegistered(true);
+    if (item.audioUrl && item.audioUrl.startsWith('data:audio')) {
+      setAudioDataUrl(item.audioUrl);
       setIsAudioValidated(true); // Existent entry begins validated
       setIsAudioListeningOccurred(true);
+    } else if (item.audioUrl) {
+      setAudioDataUrl(null); // Assuming simulated audio was meaningless
+      setIsAudioValidated(false);
+      setIsAudioListeningOccurred(false);
     } else {
-      setSimulatedAudioRegistered(false);
+      setAudioDataUrl(null);
       setIsAudioValidated(false);
       setIsAudioListeningOccurred(false);
     }
@@ -158,7 +216,7 @@ export default function InsertTranslationPage({
     setFrenchTranslation("");
     setDescription("");
     setType("written");
-    setSimulatedAudioRegistered(false);
+    setAudioDataUrl(null);
     setIsAudioValidated(false);
     setIsAudioListeningOccurred(false);
     setFormError("");
@@ -172,7 +230,7 @@ export default function InsertTranslationPage({
     }
 
     // Audio Validation constraint
-    if (type === "oral" && simulatedAudioRegistered && !isAudioValidated) {
+    if (type === "oral" && audioDataUrl && !isAudioValidated) {
       setFormError("Pour enregistrer l'audio comme translation, il faudrait d'abord l'écouter et le valider ensuite.");
       return;
     }
@@ -190,7 +248,7 @@ export default function InsertTranslationPage({
         type,
         category,
         createdAt: original ? original.createdAt : new Date().toISOString(),
-        audioUrl: simulatedAudioRegistered ? (original?.audioUrl || `simulated-voice-note-${crypto.randomUUID()}`) : undefined
+        audioUrl: audioDataUrl ? audioDataUrl : undefined
       };
       
       if (onUpdateEntry) {
@@ -207,7 +265,7 @@ export default function InsertTranslationPage({
         type,
         category,
         createdAt: new Date().toISOString(),
-        audioUrl: simulatedAudioRegistered ? `simulated-voice-note-${crypto.randomUUID()}` : undefined
+        audioUrl: audioDataUrl ? audioDataUrl : undefined
       };
 
       onAddEntry(newEntry);
@@ -219,7 +277,7 @@ export default function InsertTranslationPage({
     setFrenchTranslation("");
     setDescription("");
     setType("written");
-    setSimulatedAudioRegistered(false);
+    setAudioDataUrl(null);
     setIsAudioValidated(false);
     setIsAudioListeningOccurred(false);
     setRecordingDuration(0);
@@ -378,14 +436,14 @@ export default function InsertTranslationPage({
               </div>
             </div>
 
-            {/* Simulated Oral Recording option with custom listen and validate steps */}
+            {/* Real Oral Recording option with custom listen and validate steps */}
             <div className="bg-[#F2E9E1]/30 p-4 border border-natural-dark-border rounded-2xl space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-xs font-bold text-natural-text flex items-center gap-1.5">
                   <FileAudio size={14} className="text-natural-primary" />
                   Prononciation Vocale de Référence
                 </span>
-                {simulatedAudioRegistered && (
+                {audioDataUrl && (
                   <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded border ${
                     isAudioValidated 
                       ? "text-emerald-700 bg-emerald-50 border-emerald-100" 
@@ -406,7 +464,7 @@ export default function InsertTranslationPage({
                   </div>
                   <button
                     type="button"
-                    onClick={handleStopSimulateRecording}
+                    onClick={handleStopRecording}
                     className="bg-rose-600 hover:bg-rose-700 text-white rounded-lg px-3 py-1 text-xs font-semibold uppercase cursor-pointer"
                   >
                     Terminer
@@ -414,22 +472,40 @@ export default function InsertTranslationPage({
                 </div>
               ) : (
                 <div className="space-y-3">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-[11px] text-[#A69D91] leading-relaxed">
-                      Associez une prononciation audio amicale de référence.
+                  <div className="flex items-center justify-between gap-2 flex-wrap">
+                    <p className="text-[11px] text-[#A69D91] leading-relaxed w-full min-w-0">
+                      Associez une prononciation audio réelle de référence (micro ou fichier).
                     </p>
-                    <button
-                      type="button"
-                      onClick={handleStartSimulateRecording}
-                      className="flex items-center gap-1 bg-white border border-natural-dark-border hover:bg-[#F2E9E1] text-natural-text px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer shadow-sm transition-colors shrink-0"
-                    >
-                      <Mic size={12} className="text-natural-primary" />
-                      <span>{simulatedAudioRegistered ? "Ré-enregistrer" : "Capturer"}</span>
-                    </button>
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={handleStartRecording}
+                        className="flex items-center gap-1 bg-white border border-natural-dark-border hover:bg-[#F2E9E1] text-natural-text px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer shadow-sm transition-colors shrink-0"
+                      >
+                        <Mic size={12} className="text-natural-primary" />
+                        <span>{audioDataUrl ? "Ré-enregistrer" : "Capturer"}</span>
+                      </button>
+                      
+                      <button
+                        type="button"
+                        className="flex items-center gap-1 bg-white border border-natural-dark-border hover:bg-[#F2E9E1] text-natural-text px-3 py-1.5 rounded-xl text-xs font-bold uppercase tracking-wider cursor-pointer shadow-sm transition-colors shrink-0"
+                        onClick={() => fileInputRef.current?.click()}
+                      >
+                        <Upload size={12} className="text-natural-primary" />
+                        <span>Upload</span>
+                      </button>
+                      <input
+                        type="file"
+                        accept="audio/*"
+                        className="hidden"
+                        ref={fileInputRef}
+                        onChange={handleFileUpload}
+                      />
+                    </div>
                   </div>
 
                   {/* Play and Validation sub-section BEFORE saving */}
-                  {simulatedAudioRegistered && (
+                  {audioDataUrl && (
                     <div className="bg-[#EAE5DD]/45 p-3 rounded-xl border border-natural-border space-y-2.5">
                       <p className="text-[10px] font-serif inline-block text-natural-secondary font-bold">
                         Étape de validation requise :
@@ -578,7 +654,13 @@ export default function InsertTranslationPage({
                         <div 
                           className="p-1.5 bg-white border border-natural-dark-border text-natural-primary rounded-lg hover:bg-natural-accent cursor-pointer"
                           title="Jouer l'enregistrement audio"
-                          onClick={() => speakPresetNative(item.nativeText)}
+                          onClick={() => {
+                            if (item.audioUrl?.startsWith('data:audio')) {
+                              new Audio(item.audioUrl).play().catch(e => console.error(e));
+                            } else {
+                              speakPresetNative(item.nativeText);
+                            }
+                          }}
                         >
                           <Volume2 size={13} />
                         </div>
