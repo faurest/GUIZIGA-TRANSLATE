@@ -9,7 +9,6 @@ import {
   ChevronRight,
   BookMarked,
   Compass,
-  Smartphone,
   Keyboard
 } from "lucide-react";
 import { TranslationEntry, TabType } from "./types";
@@ -17,7 +16,6 @@ import TranslationPage from "./components/TranslationPage";
 import InsertTranslationPage from "./components/InsertTranslationPage";
 import ExamplesPage from "./components/ExamplesPage";
 import CulturePage from "./components/CulturePage";
-import ApkPage from "./components/ApkPage";
 import TranscriptionPage from "./components/TranscriptionPage";
 import { useAuth } from "./AuthContext";
 
@@ -28,7 +26,6 @@ export default function App() {
   const [sourceLang, setSourceLang] = useState<string>(() => {
     return localStorage.getItem(DEFAULT_SOURCE_LANG_KEY) || "Guiziga";
   });
-  const [isSimulatedMobileActive, setIsSimulatedMobileActive] = useState<boolean>(false);
   const [dictionary, setDictionary] = useState<TranslationEntry[]>([]);
   const { user, getToken, signIn } = useAuth();
 
@@ -233,147 +230,47 @@ export default function App() {
               <Keyboard size={15} className={activeTab === "transcription" ? "scale-110" : "opacity-70"} />
               <span>Clavier AGLC</span>
             </button>
-            <button
-              onClick={() => setActiveTab("apk")}
-              className={`flex shrink-0 snap-start items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
-                activeTab === "apk"
-                  ? "bg-gradient-to-r from-emerald-600 to-teal-700 text-white shadow-md scale-100 ring-1 ring-emerald-400"
-                  : "text-emerald-700 hover:text-emerald-800 hover:bg-emerald-50 scale-95 hover:scale-100"
-              }`}
-              id="tab_btn_apk"
-            >
-              <Smartphone size={15} className={activeTab === "apk" ? "scale-110" : "opacity-70"} />
-              <span>Version APK</span>
-            </button>
           </nav>
         </div>
       </header>
 
       {/* Main View Container */}
       <main className="flex-1 w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex justify-center" id="view_stage">
-        {isSimulatedMobileActive ? (
-          /* High-Fidelity Responsive Smartphone Shell Wrapper */
-          <div className="w-full max-w-[400px] border-[12px] border-[#4A4E40] rounded-[50px] bg-natural-bg shadow-2xl relative overflow-hidden flex flex-col my-4 min-h-[750px] border-double select-none transition-all hover:shadow-[#7D8471]/10">
-            {/* Phone Speaker & Notch */}
-            <div className="absolute top-0 inset-x-0 h-6 bg-[#4A4E40] flex justify-between items-center px-6 text-[10px] text-white font-mono z-20">
-              <span className="font-bold">08:12</span>
-              {/* Notch */}
-              <div className="w-24 h-3.5 bg-[#4A4E40] rounded-b-lg flex items-center justify-center">
-                <span className="w-8 h-1 bg-neutral-600 rounded-full"></span>
-              </div>
-              <div className="flex items-center gap-1.5 font-bold">
-                <span className="text-[9px] text-[#B5C299]">4G+ GzG</span>
-                <span className="w-4 h-2 border border-white/50 rounded-xs flex items-center p-0.5 justify-start">
-                  <span className="w-2.5 h-full bg-white rounded-2xs"></span>
-                </span>
-              </div>
-            </div>
+        <div className="w-full max-w-7xl">
+          {activeTab === "translate" && (
+            <TranslationPage 
+              sourceLang={sourceLang} 
+              setSourceLang={setSourceLang}
+              onSaveToDictionary={handleSaveToDictionaryFromTranslator}
+              dictionary={dictionary}
+            />
+          )}
 
-            {/* Interactive content inside smartphone preview (100% responsive layout container) */}
-            <div className="flex-1 overflow-y-auto max-h-[720px] p-4 pt-8 space-y-4 bg-natural-bg">
-              <div className="p-2 border border-dashed border-[#7D8471]/40 rounded-xl bg-[#7D8471]/5 text-center text-[10px] font-mono text-[#5A5A40] flex items-center justify-center gap-1.5 shadow-2xs">
-                <span className="inline-block w-2 h-2 rounded-full bg-emerald-500 animate-ping"></span>
-                <span>Mode Native responsive actif</span>
-                <button 
-                  onClick={() => setIsSimulatedMobileActive(false)} 
-                  className="bg-white px-1.5 py-0.5 rounded text-[8px] font-bold text-[#7D8471] hover:bg-neutral-100 border border-[#7D8471]/20 cursor-pointer"
-                >
-                  Fermer
-                </button>
-              </div>
+          {activeTab === "insert" && (
+            <InsertTranslationPage 
+              sourceLang={sourceLang}
+              dictionary={dictionary}
+              onAddEntry={handleAddEntry}
+              onDeleteEntry={handleDeleteEntry}
+              onUpdateEntry={handleUpdateEntry}
+            />
+          )}
 
-              {/* Dynamic Pages */}
-              {activeTab === "translate" && (
-                <TranslationPage 
-                  sourceLang={sourceLang} 
-                  setSourceLang={setSourceLang}
-                  onSaveToDictionary={handleSaveToDictionaryFromTranslator}
-                  dictionary={dictionary}
-                />
-              )}
+          {activeTab === "examples" && (
+            <ExamplesPage 
+              sourceLang={sourceLang}
+              dictionary={dictionary}
+            />
+          )}
 
-              {activeTab === "insert" && (
-                <InsertTranslationPage 
-                  sourceLang={sourceLang}
-                  dictionary={dictionary}
-                  onAddEntry={handleAddEntry}
-                  onDeleteEntry={handleDeleteEntry}
-                  onUpdateEntry={handleUpdateEntry}
-                />
-              )}
+          {activeTab === "culture" && (
+            <CulturePage />
+          )}
 
-              {activeTab === "examples" && (
-                <ExamplesPage 
-                  sourceLang={sourceLang}
-                  dictionary={dictionary}
-                />
-              )}
-
-              {activeTab === "culture" && (
-                <CulturePage />
-              )}
-
-              {activeTab === "apk" && (
-                <ApkPage 
-                  onSimulateMobileWidthToggle={() => setIsSimulatedMobileActive(prev => !prev)}
-                  isSimulatedMobileActive={isSimulatedMobileActive}
-                />
-              )}
-
-              {activeTab === "transcription" && (
-                <TranscriptionPage />
-              )}
-            </div>
-
-            {/* Smartphone Bottom Navigation Bar Bar */}
-            <div className="h-4 bg-[#4A4E40] flex items-center justify-center">
-              <div className="w-24 h-1 bg-white/60 rounded-full"></div>
-            </div>
-          </div>
-        ) : (
-          <div className="w-full max-w-7xl">
-            {activeTab === "translate" && (
-              <TranslationPage 
-                sourceLang={sourceLang} 
-                setSourceLang={setSourceLang}
-                onSaveToDictionary={handleSaveToDictionaryFromTranslator}
-                dictionary={dictionary}
-              />
-            )}
-
-            {activeTab === "insert" && (
-              <InsertTranslationPage 
-                sourceLang={sourceLang}
-                dictionary={dictionary}
-                onAddEntry={handleAddEntry}
-                onDeleteEntry={handleDeleteEntry}
-                onUpdateEntry={handleUpdateEntry}
-              />
-            )}
-
-            {activeTab === "examples" && (
-              <ExamplesPage 
-                sourceLang={sourceLang}
-                dictionary={dictionary}
-              />
-            )}
-
-            {activeTab === "culture" && (
-              <CulturePage />
-            )}
-
-            {activeTab === "apk" && (
-              <ApkPage 
-                onSimulateMobileWidthToggle={() => setIsSimulatedMobileActive(prev => !prev)}
-                isSimulatedMobileActive={isSimulatedMobileActive}
-              />
-            )}
-
-            {activeTab === "transcription" && (
-              <TranscriptionPage />
-            )}
-          </div>
-        )}
+          {activeTab === "transcription" && (
+            <TranscriptionPage />
+          )}
+        </div>
       </main>
 
       {/* Modern, Simple, Non-intrusive Footer */}
