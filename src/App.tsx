@@ -32,6 +32,50 @@ export default function App() {
   const [dictionary, setDictionary] = useState<TranslationEntry[]>([]);
   const { user, getToken, signIn } = useAuth();
 
+  const authenticData: TranslationEntry[] = [
+    { id: "1001", nativeText: "kilif", frenchTranslation: "poisson", description: "Le poisson", type: "written", category: "Quotidien", createdAt: new Date().toISOString() },
+    { id: "1002", nativeText: "kiri", frenchTranslation: "chien", description: "Le chien", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1003", nativeText: "kalaf", frenchTranslation: "feuille", description: "La feuille", type: "written", category: "Nature", createdAt: new Date().toISOString() },
+    { id: "1004", nativeText: "kukulum", frenchTranslation: "cruche", description: "La cruche", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1005", nativeText: "leke", frenchTranslation: "l'arc", description: "L'arc", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1006", nativeText: "kolobo", frenchTranslation: "bouteille", description: "La bouteille", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1007", nativeText: "leleke", frenchTranslation: "panier", description: "Le panier", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1008", nativeText: "kuruf", frenchTranslation: "tortue", description: "La tortue", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1009", nativeText: "lafa", frenchTranslation: "manche", description: "Le manche", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1010", nativeText: "mufuku", frenchTranslation: "couteau à jet", description: "Le couteau à jet", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1011", nativeText: "tarak", frenchTranslation: "chaussure", description: "La chaussure", type: "written", category: "Quotidien", createdAt: new Date().toISOString() },
+    { id: "1012", nativeText: "palaka", frenchTranslation: "hangar", description: "Le hangar", type: "written", category: "Habitat", createdAt: new Date().toISOString() },
+    { id: "1013", nativeText: "widis", frenchTranslation: "arbre", description: "L'arbre", type: "written", category: "Nature", createdAt: new Date().toISOString() },
+    { id: "1014", nativeText: "kakadaw", frenchTranslation: "cercopithèque", description: "Le cercopithèque (singe)", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1015", nativeText: "buluku", frenchTranslation: "plantoir", description: "Le plantoir", type: "written", category: "Agriculture", createdAt: new Date().toISOString() },
+    { id: "1016", nativeText: "bokoy", frenchTranslation: "coq", description: "Le coq", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1017", nativeText: "didir", frenchTranslation: "porc-épic", description: "Le porc-épic", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1018", nativeText: "magamak", frenchTranslation: "chat", description: "Le chat", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1019", nativeText: "mogodonok", frenchTranslation: "crapaud", description: "Le crapaud", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1020", nativeText: "tumun", frenchTranslation: "mouton", description: "Le mouton", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1021", nativeText: "luvut", frenchTranslation: "flèche", description: "La flèche", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1022", nativeText: "sosol", frenchTranslation: "échelle", description: "L'échelle", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1023", nativeText: "zizilim", frenchTranslation: "calao", description: "L'oiseau calao", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1024", nativeText: "zlogomo", frenchTranslation: "chameau", description: "Le chameau", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1025", nativeText: "sliwid", frenchTranslation: "couteau", description: "Le couteau", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1026", nativeText: "cuvun", frenchTranslation: "pintade", description: "La pintade", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1027", nativeText: "jijin", frenchTranslation: "mortier", description: "Le mortier", type: "written", category: "Cuisine", createdAt: new Date().toISOString() },
+    { id: "1028", nativeText: "mbaray", frenchTranslation: "bouclier", description: "Un bouclier", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1029", nativeText: "mandaf", frenchTranslation: "lapin", description: "Le lapin", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1030", nativeText: "tunjuk", frenchTranslation: "guitare", description: "La guitare", type: "written", category: "Musique", createdAt: new Date().toISOString() },
+    { id: "1031", nativeText: "ngurvun", frenchTranslation: "pierre à moudre", description: "La pierre à moudre", type: "written", category: "Cuisine", createdAt: new Date().toISOString() },
+    { id: "1032", nativeText: "hay", frenchTranslation: "maison", description: "La maison", type: "written", category: "Habitat", createdAt: new Date().toISOString() },
+    { id: "1033", nativeText: "aw ara zum daw", frenchTranslation: "la chèvre mange le mil", description: "Phrase d'usage", type: "written", category: "Phrases", createdAt: new Date().toISOString() },
+    { id: "1034", nativeText: "kwenekwene", frenchTranslation: "outre", description: "Une outre", type: "written", category: "Objets", createdAt: new Date().toISOString() },
+    { id: "1035", nativeText: "dirgwad", frenchTranslation: "grenier", description: "Le grenier", type: "written", category: "Habitat", createdAt: new Date().toISOString() },
+    { id: "1036", nativeText: "dangwal", frenchTranslation: "queue", description: "La queue", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1037", nativeText: "kron", frenchTranslation: "grenouille", description: "La grenouille", type: "written", category: "Animaux", createdAt: new Date().toISOString() },
+    { id: "1038", nativeText: "gbale", frenchTranslation: "terrasse", description: "La terrasse", type: "written", category: "Habitat", createdAt: new Date().toISOString() },
+    { id: "1039", nativeText: "ngboro", frenchTranslation: "mil rouge", description: "Le mil rouge", type: "written", category: "Agriculture", createdAt: new Date().toISOString() },
+    { id: "1040", nativeText: "kpalalan", frenchTranslation: "tronc d'arbre", description: "Le tronc d'arbre", type: "written", category: "Nature", createdAt: new Date().toISOString() },
+    { id: "1041", nativeText: "hevber", frenchTranslation: "caille", description: "La caille", type: "written", category: "Animaux", createdAt: new Date().toISOString() }
+  ];
+
   // Fetch entries from Cloud SQL via API
   useEffect(() => {
     const fetchEntries = async () => {
@@ -39,10 +83,14 @@ export default function App() {
         const res = await fetch('/api/entries');
         if (res.ok) {
           const data = await res.json();
-          setDictionary(data);
+          const combinedData = [...data, ...authenticData.filter(a => !data.some((d: any) => d.nativeText.toLowerCase() === a.nativeText.toLowerCase()))];
+          setDictionary(combinedData);
+        } else {
+          setDictionary(authenticData);
         }
       } catch (err) {
         console.error("Failed to fetch dictionary entries from database:", err);
+        setDictionary(authenticData);
       }
     };
     fetchEntries();
