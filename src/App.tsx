@@ -9,7 +9,8 @@ import {
   ChevronRight,
   BookMarked,
   Compass,
-  Keyboard
+  Keyboard,
+  Sparkles
 } from "lucide-react";
 import { TranslationEntry, TabType } from "./types";
 import TranslationPage from "./components/TranslationPage";
@@ -17,6 +18,7 @@ import InsertTranslationPage from "./components/InsertTranslationPage";
 import ExamplesPage from "./components/ExamplesPage";
 import CulturePage from "./components/CulturePage";
 import TranscriptionPage from "./components/TranscriptionPage";
+import VisionPage from "./components/VisionPage";
 import { useAuth } from "./AuthContext";
 
 const DEFAULT_SOURCE_LANG_KEY = "maternelle_source_lang_v2";
@@ -217,6 +219,18 @@ export default function App() {
               <Compass size={15} className={activeTab === "culture" ? "scale-110" : "opacity-70"} />
               <span>Peuple & Culture</span>
             </button>
+            <button
+              onClick={() => setActiveTab("vision")}
+              className={`flex shrink-0 snap-start items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-semibold transition-all duration-300 cursor-pointer ${
+                activeTab === "vision"
+                  ? "bg-gradient-to-br from-natural-primary to-[#5A5A40] text-white shadow-md scale-100 ring-1 ring-white/20"
+                  : "text-natural-secondary hover:text-natural-text hover:bg-white/50 scale-95 hover:scale-100"
+              }`}
+              id="tab_btn_vision"
+            >
+              <Sparkles size={15} className={activeTab === "vision" ? "scale-110" : "opacity-70"} />
+              <span>Vision & Impact</span>
+            </button>
             <div className="w-px h-6 bg-natural-border mx-1 hidden sm:block"></div>
             <button
               onClick={() => setActiveTab("transcription")}
@@ -265,6 +279,10 @@ export default function App() {
 
           {activeTab === "culture" && (
             <CulturePage />
+          )}
+
+          {activeTab === "vision" && (
+            <VisionPage />
           )}
 
           {activeTab === "transcription" && (
